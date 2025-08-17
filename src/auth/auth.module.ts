@@ -6,6 +6,8 @@ import { User, UserSchema } from './entities/user.entity';
 import { Role, RoleSchema } from './entities/role.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from '../middleware/jwt.strategy';
 
 
 @Module({
@@ -18,13 +20,14 @@ import { ConfigModule } from '@nestjs/config';
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema },  
     ]),
-      JwtModule.register({
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
       secret: process.env.JWT_SECRET,
     }),
 
   ],
 
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

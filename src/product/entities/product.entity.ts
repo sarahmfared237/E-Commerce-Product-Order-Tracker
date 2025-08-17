@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Category } from './category.entity';
 export type ProductDocument = Product & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true })
   name: string;
@@ -16,6 +16,12 @@ export class Product {
 
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
   category: Category;
+
+  @Prop({ required: true })
+  stock: number;
+
+  @Prop({ required: true })
+  imageURL: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -19,7 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // 🔹 Register new user
+  // Register new user
   async register(registerDto: RegisterDto): Promise<UserProfileDto> {
     const { username, email, password } = registerDto;
 
@@ -53,7 +53,7 @@ export class AuthService {
     return new UserProfileDto(await user.save());
   }
 
-  // 🔹 Generate JWT token
+  // Generate JWT token
   async generateToken(userId: any) {
     const payload = { sub: userId }; 
     return this.jwtService.sign(payload);
