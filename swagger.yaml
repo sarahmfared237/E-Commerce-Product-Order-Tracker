@@ -1,0 +1,387 @@
+openapi: 3.0.3
+info:
+  title: E-Commerce API
+  version: 1.0.0
+  description: API documentation for E-Commerce system.
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Products
+    description: Manage and browse products
+  - name: Orders
+    description: Manage customer and admin orders
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+
+    ProductCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    ProductPublic:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          $ref: '#/components/schemas/ProductCategory'
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        imageURL:
+          type: string
+
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductPublic'
+        - type: object
+          properties:
+            stock:
+              type: integer
+
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    OrderLine:
+      type: object
+      properties:
+        id:
+          type: integer
+        product:
+          $ref: '#/components/schemas/ProductPublic'
+        quantity:
+          type: integer
+        priceSnapshot:
+          type: number
+          format: float
+
+    OrderWithUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
+        status:
+          $ref: '#/components/schemas/Status'
+        total:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+
+    OrderWithoutUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/Status'
+        total:
+          type: number
+          format: float
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Create account
+      description: Create account with role assigned automatically (admin/customer).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password]
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      description: Returns JWT on valid credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Invalid credentials
+
+  /products:
+    get:
+      tags: [Products]
+      summary: List products
+      description: List products without stock info.
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: integer
+        - in: query
+          name: q
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product list without stock
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductPublic'
+
+    post:
+      security:
+        - bearerAuth: []
+      tags: [Products]
+      summary: Create product
+      description: Admin only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+        '403':
+          description: Forbidden
+
+  /products/{id}:
+    patch:
+      security:
+        - bearerAuth: []
+      tags: [Products]
+      summary: Update product
+      description: Admin only.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Product updated
+        '404':
+          description: Not found
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [Products]
+      summary: Delete product
+      description: Admin only.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Product deleted
+        '404':
+          description: Not found
+
+  /orders:
+    post:
+      security:
+        - bearerAuth: []
+      tags: [Orders]
+      summary: Place order
+      description: Customer only. Place order from cart items.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderLines]
+              properties:
+                orderLines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: integer
+                      quantity:
+                        type: integer
+      responses:
+        '201':
+          description: Order placed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderWithoutUser'
+        '400':
+          description: Bad request
+
+    get:
+      security:
+        - bearerAuth: []
+      tags: [Orders]
+      summary: List all orders
+      description: Admin only. Returns a list of all orders with full user data.
+      responses:
+        '200':
+          description: List of orders with full user details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderWithUser'
+
+  /orders/me:
+    get:
+      security:
+        - bearerAuth: []
+      tags: [Orders]
+      summary: List current user's orders
+      description: Customer only. Does not include `user_id`.
+      responses:
+        '200':
+          description: User's orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderWithoutUser'
+
+  /orders/{id}/status:
+    patch:
+      security:
+        - bearerAuth: []
+      tags: [Orders]
+      summary: Update order status
+      description: Admin only.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status_id:
+                  type: integer
+      responses:
+        '200':
+          description: Status updated
+        '404':
+          description: Not found
