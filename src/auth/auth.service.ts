@@ -7,8 +7,9 @@ import { User, UserDocument } from './entities/user.entity';
 import { Role, RoleDocument } from './entities/role.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
+import { UserProfileDto } from './dto/user-profile.dto';
 import { JwtService } from '@nestjs/jwt';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
   ) {}
 
   // 🔹 Register new user
-  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+  async register(registerDto: RegisterDto): Promise<UserProfileDto> {
     const { username, email, password } = registerDto;
 
     // check if user exists
@@ -49,7 +50,7 @@ export class AuthService {
       role: role._id,
     });
 
-    return new RegisterResponseDto(await user.save());
+    return new UserProfileDto(await user.save());
   }
 
   // 🔹 Generate JWT token
@@ -57,8 +58,8 @@ export class AuthService {
     const payload = { sub: userId }; 
     return this.jwtService.sign(payload);
   }
-  // 🔹 Login user
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  // Login user
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const { email, password } = loginDto;
 
     const user = await this.userModel.findOne({ email }).populate('role');
@@ -72,6 +73,6 @@ export class AuthService {
     }
 
     const token = await this.generateToken(user._id);
-    return { token };
+    return new LoginResponseDto(token, user);
   }
 }
