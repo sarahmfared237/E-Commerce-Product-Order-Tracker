@@ -23,7 +23,6 @@ export class OrderController {
   findAll() {
     return this.orderService.findAll();
   }
-// get orders by user id
   @Get('me')
   findMyOrders(@Req() req) {
     return this.orderService.findMyOrders(req.user._id);
