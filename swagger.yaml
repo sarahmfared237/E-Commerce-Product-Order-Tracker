@@ -84,6 +84,29 @@ components:
             stock:
               type: integer
 
+    ProductCreateUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: LAPTOP
+        categoryID:
+          type: string
+          example: 68a251d988ecbb3bfa1f1e23
+        description:
+          type: string
+          example: string
+        price:
+          type: number
+          format: float
+          example: 3303.977788264407
+        imageURL:
+          type: string
+          example: string
+        stock:
+          type: integer
+          example: 8102
+
     Status:
       type: object
       properties:
@@ -234,7 +257,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductCreateUpdate'
       responses:
         '201':
           description: Product created
@@ -273,7 +296,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/ProductCreateUpdate'
       responses:
         '200':
           description: Product updated
