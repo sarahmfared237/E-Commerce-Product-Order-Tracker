@@ -5,8 +5,8 @@ info:
   description: API documentation for E-Commerce system.
 
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Local development server
+  - url: https://e-commerce-product-order-tracker-production.up.railway.app/api/v1
+    description: Production server
 
 tags:
   - name: Auth
@@ -28,7 +28,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          description: MongoDB ObjectId
         name:
           type: string
 
@@ -36,17 +37,19 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         username:
           type: string
         email:
           type: string
+        role:
+          $ref: '#/components/schemas/Role'
 
     ProductCategory:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
 
@@ -54,7 +57,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         category:
@@ -85,7 +88,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
 
@@ -93,7 +96,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         product:
           $ref: '#/components/schemas/ProductPublic'
         quantity:
@@ -106,7 +109,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         user:
           $ref: '#/components/schemas/User'
         status:
@@ -129,7 +132,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         status:
           $ref: '#/components/schemas/Status'
         total:
@@ -151,7 +154,6 @@ paths:
     post:
       tags: [Auth]
       summary: Create account
-      description: Create account with role assigned automatically (admin/customer).
       requestBody:
         required: true
         content:
@@ -168,19 +170,16 @@ paths:
                   type: string
       responses:
         '201':
-          description: Account created successfully
+          description: Account created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid input
 
   /auth/login:
     post:
       tags: [Auth]
       summary: Login
-      description: Returns JWT on valid credentials.
       requestBody:
         required: true
         content:
@@ -195,7 +194,7 @@ paths:
                   type: string
       responses:
         '200':
-          description: Login successful
+          description: JWT token
           content:
             application/json:
               schema:
@@ -203,26 +202,19 @@ paths:
                 properties:
                   token:
                     type: string
-        '401':
-          description: Invalid credentials
 
   /products:
     get:
       tags: [Products]
       summary: List products
-      description: List products without stock info.
       parameters:
         - in: query
-          name: category
-          schema:
-            type: integer
-        - in: query
-          name: q
+          name: categoryID
           schema:
             type: string
       responses:
         '200':
-          description: Product list without stock
+          description: Product list
           content:
             application/json:
               schema:
@@ -234,8 +226,7 @@ paths:
       security:
         - bearerAuth: []
       tags: [Products]
-      summary: Create product
-      description: Admin only.
+      summary: Create product (Admin only)
       requestBody:
         required: true
         content:
@@ -245,22 +236,36 @@ paths:
       responses:
         '201':
           description: Product created
-        '403':
-          description: Forbidden
 
   /products/{id}:
-    patch:
-      security:
-        - bearerAuth: []
+    get:
       tags: [Products]
-      summary: Update product
-      description: Admin only.
+      summary: Get product by ID
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            type: integer
+            type: string
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductPublic'
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags: [Products]
+      summary: Update product (Admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -270,51 +275,42 @@ paths:
       responses:
         '200':
           description: Product updated
-        '404':
-          description: Not found
 
     delete:
       security:
         - bearerAuth: []
       tags: [Products]
-      summary: Delete product
-      description: Admin only.
+      summary: Delete product (Admin only)
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '204':
           description: Product deleted
-        '404':
-          description: Not found
 
   /orders:
     post:
       security:
         - bearerAuth: []
       tags: [Orders]
-      summary: Place order
-      description: Customer only. Place order from cart items.
+      summary: Place order (Customer only)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [orderLines]
-              properties:
-                orderLines:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      product_id:
-                        type: integer
-                      quantity:
-                        type: integer
+              type: array
+              items:
+                type: object
+                required: [productID, quantity]
+                properties:
+                  productID:
+                    type: string
+                  quantity:
+                    type: integer
       responses:
         '201':
           description: Order placed
@@ -322,18 +318,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderWithoutUser'
-        '400':
-          description: Bad request
 
     get:
       security:
         - bearerAuth: []
       tags: [Orders]
-      summary: List all orders
-      description: Admin only. Returns a list of all orders with full user data.
+      summary: List all orders (Admin only)
       responses:
         '200':
-          description: List of orders with full user details
+          description: All orders with user info
           content:
             application/json:
               schema:
@@ -347,10 +340,9 @@ paths:
         - bearerAuth: []
       tags: [Orders]
       summary: List current user's orders
-      description: Customer only. Does not include `user_id`.
       responses:
         '200':
-          description: User's orders
+          description: My orders
           content:
             application/json:
               schema:
@@ -363,25 +355,23 @@ paths:
       security:
         - bearerAuth: []
       tags: [Orders]
-      summary: Update order status
-      description: Admin only.
+      summary: Update order status (Admin only)
       parameters:
         - in: path
           name: id
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [status]
               properties:
-                status_id:
-                  type: integer
+                status:
+                  type: string
       responses:
         '200':
           description: Status updated
-        '404':
-          description: Not found
