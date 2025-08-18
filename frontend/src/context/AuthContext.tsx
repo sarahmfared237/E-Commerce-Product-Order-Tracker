@@ -19,8 +19,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {}, []);
 
-  const handleLogin = async (username: string, password: string) => {
-    const response = await login({ username, password });
+  const handleLogin = async (email: string, password: string) => {
+    const response = await login({ email, password });
     localStorage.setItem('token', response.token);
     setToken(response.token);
     setUser(response.user);

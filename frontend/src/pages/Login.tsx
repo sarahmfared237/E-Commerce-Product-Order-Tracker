@@ -5,7 +5,7 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(username, password);
+      await login(email, password);
       navigate('/');
     } catch (err) {
       setError('Failed to login. Please check your credentials.');
@@ -34,14 +34,14 @@ const Login: React.FC = () => {
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="username">
-            Username
+          <label className="block text-gray-700 mb-2" htmlFor="email">
+            Email
           </label>
           <Input
-            id="username"
+            id="email"
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>

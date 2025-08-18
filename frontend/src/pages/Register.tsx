@@ -8,10 +8,7 @@ const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    firstName: '',
-    lastName: '',
     email: '',
-    phone: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,32 +42,6 @@ const Register: React.FC = () => {
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700 mb-2" htmlFor="firstName">
-              First Name
-            </label>
-            <Input
-              id="firstName"
-              name="firstName"
-              type="text"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2" htmlFor="lastName">
-              Last Name
-            </label>
-            <Input
-              id="lastName"
-              name="lastName"
-              type="text"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </div>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 mb-2" htmlFor="username">
@@ -98,19 +69,7 @@ const Register: React.FC = () => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2" htmlFor="phone">
-            Phone
-          </label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
+   
         <div className="mb-6">
           <label className="block text-gray-700 mb-2" htmlFor="password">
             Password
