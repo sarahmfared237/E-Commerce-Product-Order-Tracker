@@ -19,7 +19,7 @@ const Orders: React.FC = () => {
     const loadOrders = async () => {
       try {
         const data = await fetchUserOrders();
-        setOrders(data.orders);
+        setOrders(data);
       } catch (error) {
         console.error('Failed to fetch orders:', error);
       } finally {
@@ -52,25 +52,25 @@ const Orders: React.FC = () => {
       <h1 className="text-3xl font-bold mb-8">Your Orders</h1>
       <div className="space-y-6">
         {orders.map((order) => (
-          <div key={order.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div key={order._id} className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-4 border-b">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between orderLines-center">
                 <div>
-                  <h2 className="font-bold">Order #{order.id}</h2>
+                  <h2 className="font-bold">Order #{order._id}</h2>
                   <p className="text-gray-600 text-sm">
                     Placed on {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">
-                    ${order.items.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}
+                    ${order.orderLines.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}
                   </p>
                 </div>
               </div>
             </div>
             <div className="p-4">
-              {order.items.map((item) => (
-                <div key={item.product.id} className="flex items-center py-2 border-b last:border-b-0">
+              {order.orderLines.map((item) => (
+                <div key={item.product._id} className="flex orderLines-center py-2 border-b last:border-b-0">
                   <img
                     src={item.product.imgLink}
                     alt={item.product.name}

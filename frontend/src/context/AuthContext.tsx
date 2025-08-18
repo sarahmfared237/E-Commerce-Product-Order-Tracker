@@ -5,7 +5,7 @@ import { register, login } from '../api/auth';
 interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -20,16 +20,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {}, []);
 
   const handleLogin = async (email: string, password: string) => {
+    console.log("login done :))");
     const response = await login({ email, password });
-    localStorage.setItem('token', response.token);
+    localStorage.setItem('token','Bearer ' + response.token);
     setToken(response.token);
+    console.log(token);
     setUser(response.user);
   };
 
   const handleRegister = async (userData: any) => {
     const response = await register(userData);
-    localStorage.setItem('token', response.token);
-    setToken(response.token);
     setUser(response.user);
   };
 

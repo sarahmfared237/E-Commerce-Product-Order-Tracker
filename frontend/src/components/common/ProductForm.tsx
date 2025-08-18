@@ -11,7 +11,7 @@ const ProductForm: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(!!id);
   const [product, setProduct] = useState<Partial<Product>>({
-    id: '',
+    _id: '',
     name: '',
     description: '',
     imgLink: '',
@@ -80,7 +80,7 @@ const ProductForm: React.FC = () => {
             type="text"
             id="id"
             name="id"
-            value={product.id}
+            value={product._id}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded shadow appearance-none"
             required

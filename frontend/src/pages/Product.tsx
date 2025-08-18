@@ -31,7 +31,7 @@ const AdminProducts: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await deleteProduct(id);
-        setProducts(products.filter(p => p.id !== id));
+        setProducts(products.filter(p => p._id !== id));
       } catch (error) {
         console.error('Failed to delete product:', error);
       }
@@ -69,7 +69,7 @@ const AdminProducts: React.FC = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {products.map((product) => (
-              <tr key={product.id}>
+              <tr key={product._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
@@ -81,18 +81,18 @@ const AdminProducts: React.FC = () => {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product._id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.price.toFixed(2)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
-                    to={`/admin/products/edit/${product.id}`}
+                    to={`/admin/products/edit/${product._id}`}
                     className="text-indigo-600 hover:text-indigo-900 mr-4"
                   >
                     Edit
                   </Link>
                   <button
-                    onClick={() => handleDelete(product.id)}
+                    onClick={() => handleDelete(product._id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     Delete

@@ -1,5 +1,5 @@
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   imgLink: string;
@@ -9,6 +9,6 @@ export interface Product {
 }
 
 export interface ProductCategory {
-  id: string;
+  _id: string;
   name: string;
 }

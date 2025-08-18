@@ -22,7 +22,7 @@ const Cart: React.FC = () => {
     try {
       const orderItems = cart.items.map((item) => ({
         quantity: item.quantity,
-        productID: item.product.id
+        productID: item.product._id
       }));
 
       const response = await placeOrder(orderItems);
@@ -67,7 +67,7 @@ const Cart: React.FC = () => {
               </thead>
               <tbody>
                 {cart.items.map((item) => (
-                  <tr key={item.product.id} className="border-t">
+                  <tr key={item.product._id} className="border-t">
                     <td className="py-4 px-4">
                       <div className="flex items-center">
                         <img
@@ -90,7 +90,7 @@ const Cart: React.FC = () => {
                         min="1"
                         value={item.quantity}
                         onChange={(e) =>
-                          updateQuantity(item.product.id, parseInt(e.target.value) || 1)
+                          updateQuantity(item.product._id, parseInt(e.target.value) || 1)
                         }
                         className="w-16 p-1 border rounded"
                       />
@@ -100,7 +100,7 @@ const Cart: React.FC = () => {
                     </td>
                     <td className="py-4 px-4">
                       <button
-                        onClick={() => removeFromCart(item.product.id)}
+                        onClick={() => removeFromCart(item.product._id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         Remove
