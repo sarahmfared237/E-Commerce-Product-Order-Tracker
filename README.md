@@ -89,3 +89,7 @@ JWT_SECRET= supersecret
 
 ## API docs
 included in the swagger file
+
+## Backend Deployment on Railway
+Automatic commits on main are automatically deployed on railway
+The railway server: e-commerce-product-order-tracker-production.up.railway.app
