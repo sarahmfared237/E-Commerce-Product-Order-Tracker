@@ -5,7 +5,7 @@ export class UpdateProductDto {
 
   name: string;
 
-  categoryid: string;
+  categoryID: string;
   
   price: number;
 

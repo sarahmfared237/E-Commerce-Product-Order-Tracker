@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderLineDto } from './dto/create-order-line.dto';
+import { JwtAuthGuard } from 'src/middleware/jwt-auth.guard';
+import { RolesGuard } from 'src/middleware/roles.guard';
+import { Roles } from 'src/middleware/roles.decorator';
 
-@Controller('order')
+@UseGuards(JwtAuthGuard)
+@Controller('api/v1/orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
-
+  
+// create order
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Req() req) {
+    const createOrderDto: CreateOrderLineDto[] = req.body;
+    return this.orderService.create(createOrderDto, req.user._id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Get()
   findAll() {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  @Get('me')
+  findMyOrders(@Req() req) {
+    return this.orderService.findMyOrders(req.user._id);
+  }
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @Patch(':id/status')
+  update(@Param('id') id: string) {
+    return this.orderService.update(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
-  }
 }

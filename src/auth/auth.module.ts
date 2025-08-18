@@ -22,7 +22,7 @@ import { JwtStrategy } from '../middleware/jwt.strategy';
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET, signOptions: { expiresIn: '2h' },
     }),
 
   ],

@@ -24,9 +24,8 @@ export class ProductService {
   // Create Product
   async create(createProductDto: CreateProductDto): Promise<Product> {
     // Ensure category exists
-    console.log('Creating product with category ID:', createProductDto.categoryid);
     const category = await this.categoryModel.findById(
-      createProductDto.categoryid,
+      createProductDto.categoryID,
     );
     if (!category) {
       throw new BadRequestException('Invalid category ID');
@@ -34,14 +33,24 @@ export class ProductService {
   
     const newProduct = new this.productModel({
       ...createProductDto,
-      category: new Types.ObjectId(createProductDto.categoryid as any),
+      category: new Types.ObjectId(createProductDto.categoryID as any),
     });
 
     return (await newProduct.save()).populate('category');
   }
 
   // Get All Products (with category populated)
-  async findAll(): Promise<Product[]> {
+  async findAll(categoryID: string | undefined): Promise<Product[]> {
+    if (categoryID) {
+      if (!Types.ObjectId.isValid(categoryID)) {
+        throw new BadRequestException('Invalid category ID');
+      }
+      if (!(await this.categoryModel.exists({ _id: categoryID }))) {
+        throw new NotFoundException('Category not found');
+      }
+      return this.productModel.find({ category: new Types.ObjectId(categoryID) }).populate('category').exec();
+    }
+
     return this.productModel.find().populate('category').exec();
   }
 
@@ -72,14 +81,14 @@ export class ProductService {
       throw new BadRequestException('Invalid product ID');
     }
     const updateData: any = { ...updateProductDto };
-    if (updateProductDto.categoryid) {
+    if (updateProductDto.categoryID) {
       const categoryExists = await this.categoryModel.findById(
-        updateProductDto.categoryid,
+        updateProductDto.categoryID,
       );
       if (!categoryExists) {
         throw new BadRequestException('Invalid category ID');
       }
-      updateData.category = new Types.ObjectId(updateProductDto.categoryid);
+      updateData.category = new Types.ObjectId(updateProductDto.categoryID);
     }
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateData, { new: true })

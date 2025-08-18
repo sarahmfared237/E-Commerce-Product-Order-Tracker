@@ -6,7 +6,7 @@ export class CreateProductDto {
   name: string;
 
   @IsNotEmpty()
-  categoryid: Types.ObjectId;
+  categoryID: Types.ObjectId;
 
   @IsNotEmpty()
   price: number;
