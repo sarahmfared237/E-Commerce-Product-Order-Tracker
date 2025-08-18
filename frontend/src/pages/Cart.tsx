@@ -71,7 +71,7 @@ const Cart: React.FC = () => {
                     <td className="py-4 px-4">
                       <div className="flex items-center">
                         <img
-                          src={item.product.imgLink}
+                          src={item.product.imageURL}
                           alt={item.product.name}
                           className="w-16 h-16 object-cover mr-4"
                         />

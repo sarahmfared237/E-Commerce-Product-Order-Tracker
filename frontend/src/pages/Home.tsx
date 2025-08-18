@@ -46,7 +46,7 @@ const Home: React.FC = () => {
         {products.map((product) => (
           <Card key={product._id}>
             <img 
-              src={product.imgLink} 
+              src={product.imageURL} 
               alt={product.name} 
               className="w-full h-48 object-cover mb-4"
             />

@@ -10,7 +10,7 @@ const AdminOrders: React.FC = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.role !== 'ADMIN') return;
+    if (user?.role !== 'admin') return;
     
     const loadOrders = async () => {
       try {

@@ -12,12 +12,16 @@ export const fetchProduct = async (id: string): Promise<Product> => {
   return response.data;
 };
 
-export const createProduct = async (product: Product): Promise<Product> => {
+export const createProduct = async (product: any): Promise<Product> => {
+  product.categoryID = product.category._id;
+    delete product.category;
   const response = await api.post('/products', product);
   return response.data;
 };
 
-export const updateProduct = async (id: string, product: Product): Promise<Product> => {
+export const updateProduct = async (id: string, product: any): Promise<Product> => {
+  product.categoryID = product.category._id;
+  delete product.category;
   const response = await api.patch(`/products/${id}`, product);
   return response.data;
 };

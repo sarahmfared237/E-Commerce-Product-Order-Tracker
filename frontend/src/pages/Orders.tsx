@@ -53,42 +53,70 @@ const Orders: React.FC = () => {
       <div className="space-y-6">
         {orders.map((order) => (
           <div key={order._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-4 border-b">
-              <div className="flex justify-between orderLines-center">
-                <div>
-                  <h2 className="font-bold">Order #{order._id}</h2>
-                  <p className="text-gray-600 text-sm">
-                    Placed on {new Date(order.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">
-                    ${order.orderLines.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4">
-              {order.orderLines.map((item) => (
-                <div key={item.product._id} className="flex orderLines-center py-2 border-b last:border-b-0">
-                  <img
-                    src={item.product.imgLink}
-                    alt={item.product.name}
-                    className="w-16 h-16 object-cover mr-4"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-medium">{item.product.name}</h3>
-                    <p className="text-gray-600 text-sm">{item.product.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <p>${item.product.price.toFixed(2)} × {item.quantity}</p>
-                    <p className="font-bold">
-                      ${(item.product.price * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+<div className="p-4 border-b">
+  <div className="flex justify-between items-center">
+    <div>
+      <h2 className="font-bold">Order #{order._id}</h2>
+      <p className="text-gray-600 text-sm">
+        Placed on {new Date(order.createdAt).toLocaleDateString()}
+      </p>
+      {/* ✅ Order Status */}
+      <p className="mt-1 text-sm">
+        Status:{" "}
+        <span
+          className={
+            order.status.name === "delivered"
+              ? "text-green-600 font-semibold"
+              : order.status.name === "shipped"
+              ? "text-blue-600 font-semibold"
+              : "text-yellow-600 font-semibold"
+          }
+        >
+          {order.status.name}
+        </span>
+      </p>
+    </div>
+    <div className="text-right">
+      <p className="font-bold">${order.total.toFixed(2)}</p>
+    </div>
+  </div>
+</div>
+
+<div className="p-4">
+  {order.orderLines.map((item) => (
+    <div
+      key={item._id} // ✅ safer: use orderLine id, since product may be null
+      className="flex items-center py-2 border-b last:border-b-0"
+    >
+      {item.product ? (
+        <>
+          <img
+            src={item.product.imageURL}
+            alt={item.product.name}
+            className="w-16 h-16 object-cover mr-4"
+          />
+          <div className="flex-1">
+            <h3 className="font-medium">{item.product.name}</h3>
+            <p className="text-gray-600 text-sm">{item.product.description}</p>
+          </div>
+          <div className="text-right">
+            <p>
+              ${item.product.price.toFixed(2)} × {item.quantity}
+            </p>
+            <p className="font-bold">
+              ${(item.product.price * item.quantity).toFixed(2)}
+            </p>
+          </div>
+        </>
+      ) : (
+        <div className="flex-1 text-gray-500 italic">
+          Product no longer available
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
           </div>
         ))}
       </div>

@@ -1,7 +1,7 @@
 // src/components/admin/ProductForm.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Product } from '../../models/product';
+import { CategoryOptions, Product } from '../../models/product';
 import { useAuth } from '../../context/AuthContext';
 import { createProduct, fetchProduct, updateProduct } from '../../api/product';
 
@@ -11,16 +11,16 @@ const ProductForm: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(!!id);
   const [product, setProduct] = useState<Partial<Product>>({
-    _id: '',
     name: '',
     description: '',
-    imgLink: '',
+    category: CategoryOptions.MEN,
+    imageURL: '',
     price: 0,
     stock: 0
   });
 
   useEffect(() => {
-    if (user?.role !== 'ADMIN') return;
+    if (user?.role !== 'admin') return;
 
     if (id) {
       const loadProduct = async () => {
@@ -38,6 +38,7 @@ const ProductForm: React.FC = () => {
   }, [id, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    //product.categoryID = product.category._id
     e.preventDefault();
     try {
       if (id) {
@@ -55,39 +56,36 @@ const ProductForm: React.FC = () => {
     const { name, value } = e.target;
     setProduct(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'quantity' ? Number(value) : value
+      [name]: name === 'price' || name === 'stock' ? Number(value) : value
     }));
   };
 
-  if (user?.role !== 'ADMIN') {
+  if (user?.role !== 'admin') {
     return <div className="container mx-auto p-4">Unauthorized access</div>;
   }
 
   if (loading) return <div className="container mx-auto p-4">Loading...</div>;
+  // handleChange already handles text/number
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const { value } = e.target;
+      const category = Object.values(CategoryOptions).find(c => c._id === value);
+      if (category) {
+        setProduct(prev => ({
+          ...prev,
+          category
+        }));
+      }
+    };
 
-  return (
+return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">
         {id ? 'Edit Product' : 'Create New Product'}
       </h1>
       
       <form onSubmit={handleSubmit} className="max-w-2xl">
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="id">
-            Product id
-          </label>
-          <input
-            type="text"
-            id="id"
-            name="id"
-            value={product._id}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
-            required
-            disabled={!!id}
-          />
-        </div>
 
+        {/* --- Name --- */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Name
@@ -103,6 +101,7 @@ const ProductForm: React.FC = () => {
           />
         </div>
 
+        {/* --- Description --- */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
             Description
@@ -118,21 +117,43 @@ const ProductForm: React.FC = () => {
           />
         </div>
 
+        {/* --- Image --- */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="imgLink">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="imageURL">
             Image URL
           </label>
           <input
             type="url"
-            id="imgLink"
-            name="imgLink"
-            value={product.imgLink}
+            id="imageURL"
+            name="imageURL"
+            value={product.imageURL}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded shadow appearance-none"
             required
           />
         </div>
 
+        {/* --- Category Dropdown --- */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+            Category
+          </label>
+          <select
+            id="category"
+            name="category"
+            value={product.category?._id || ''}
+            onChange={handleSelectChange}
+            className="w-full px-3 py-2 border rounded shadow appearance-none"
+          >
+            {Object.values(CategoryOptions).map(cat => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* --- Price & Stock --- */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
@@ -144,29 +165,28 @@ const ProductForm: React.FC = () => {
               name="price"
               value={product.price}
               onChange={handleChange}
-              min="0"
-              step="0.01"
+              step="10"
               className="w-full px-3 py-2 border rounded shadow appearance-none"
               required
             />
           </div>
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quantity">
-              Quantity in Stock
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="stock">
+              Stock 
             </label>
             <input
               type="number"
-              id="quantity"
-              name="quantity"
+              id="stock"
+              name="stock"
               value={product.stock}
               onChange={handleChange}
-              min="0"
               className="w-full px-3 py-2 border rounded shadow appearance-none"
               required
             />
           </div>
         </div>
 
+        {/* --- Buttons --- */}
         <div className="flex justify-end space-x-4">
           <button
             type="button"

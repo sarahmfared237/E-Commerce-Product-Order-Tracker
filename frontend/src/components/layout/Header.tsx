@@ -50,7 +50,7 @@ const Header: React.FC = () => {
         </Link>
       )}
       
-      {user?.role === 'ADMIN' && (
+      {user?.role === 'admin' && (
       <Link 
         to="/admin/products" 
         className="px-3 py-2 text-gray-700 hover:text-indigo-600 font-medium transition-colors"

@@ -7,8 +7,10 @@ export interface OrderItemRequest {
 }
 
 export interface OrderLine {
+  _id: string;
   product: Product;
   quantity: number;
+  priceSnapshot: number;
 }
 
 export interface Order {
@@ -17,6 +19,7 @@ export interface Order {
   createdAt: string;
   status: OrderStatus;
   orderLines: OrderLine[];
+  total: number;
 }
 
 export interface OrderStatus {

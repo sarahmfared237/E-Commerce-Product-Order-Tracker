@@ -11,7 +11,7 @@ const AdminProducts: React.FC = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.role !== 'ADMIN') return;
+    if (user?.role !== 'admin') return;
     
     const loadProducts = async () => {
       try {
@@ -38,7 +38,7 @@ const AdminProducts: React.FC = () => {
     }
   };
 
-  if (user?.role !== 'ADMIN') {
+  if (user?.role !== 'admin') {
     return <div className="container mx-auto p-4">Unauthorized access</div>;
   }
 
@@ -61,10 +61,11 @@ const AdminProducts: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">id</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -73,7 +74,7 @@ const AdminProducts: React.FC = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img className="h-10 w-10 rounded-full" src={product.imgLink} alt={product.name} />
+                      <img className="h-10 w-10 rounded-full" src={product.imageURL} alt={product.name} />
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -81,9 +82,10 @@ const AdminProducts: React.FC = () => {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product._id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.price.toFixed(2)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category.name}</td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
                     to={`/admin/products/edit/${product._id}`}
