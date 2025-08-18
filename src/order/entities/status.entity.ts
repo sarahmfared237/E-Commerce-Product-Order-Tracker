@@ -7,6 +7,8 @@ export type StatusDocument = Status & Document;
 export class Status {
   @Prop({ required: true, unique: true })
   name: string; 
+  @Prop({ required: true })
+  nextStatusID: string | null; 
 }
 
 export const StatusSchema = SchemaFactory.createForClass(Status);
